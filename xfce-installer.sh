@@ -25,9 +25,6 @@ if [[ $EUID -ne 0 ]]; then
    error_exit "This script must be run as root."
 fi
 
-echo "Verifying network connection..."
-ping -c 3 archlinux.org || error_exit "No internet connection. Please ensure NetworkManager is running and you are connected."
-
 echo "Updating system packages..."
 pacman -Syu --noconfirm || error_exit "Failed to update system."
 
