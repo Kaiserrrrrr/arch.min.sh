@@ -1,6 +1,8 @@
 # arch.min.sh
 
-arch install made easy
+## Lightweight. Minimalist. Unopinionated.
+
+### Installation
 
 ```bash
 curl -fsSL https://bit.ly/archmin | sh
