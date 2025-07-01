@@ -5,5 +5,5 @@
 ### Installation
 
 ```bash
-curl -fsSL https://bit.ly/archmin | sh
+curl -fsSL https://raw.githubusercontent.com/Kaiserrrrrr/arch.min.sh/refs/heads/main/installer.sh | sh
 ```
