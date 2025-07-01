@@ -1,6 +1,6 @@
 #!/bin/bash
 
-KDE_PACKAGES="xorg xorg-server plasma-desktop sddm dolphin konsole plasma-wayland-session networkmanager"
+KDE_PACKAGES="xorg xorg-server plasma-desktop sddm dolphin konsole plasma-wayland-session"
 
 error_exit() {
     echo "ERROR: $1" >&2
