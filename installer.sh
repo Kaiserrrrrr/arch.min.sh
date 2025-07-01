@@ -64,8 +64,8 @@ echo ""
 
 # Get partition paths after manual partitioning
 read -p "Enter the EFI System Partition (e.g., /dev/sda1): " EFI_PARTITION
-if [ ! -b "$EFI_PARTITION" ]; then
-    error_exit "$EFI_PARTITION is not a valid block device. Please re-check your input."
+if [ -z "$EFI_PARTITION" ] || [ ! -b "$EFI_PARTITION" ]; then
+    error_exit "$EFI_PARTITION is not a valid block device or was left empty. Please re-check your input."
 fi
 
 if [ "$SWAP_SIZE" != "0" ]; then
@@ -76,8 +76,8 @@ if [ "$SWAP_SIZE" != "0" ]; then
 fi
 
 read -p "Enter the ROOT Partition (e.g., /dev/sda3): " ROOT_PARTITION
-if [ ! -b "$ROOT_PARTITION" ]; then
-    error_exit "$ROOT_PARTITION is not a valid block device. Please re-check your input."
+if [ -z "$ROOT_PARTITION" ] || [ ! -b "$ROOT_PARTITION" ]; then
+    error_exit "$ROOT_PARTITION is not a valid block device or was left empty. Please re-check your input."
 fi
 
 
@@ -112,10 +112,13 @@ echo "fstab generated. Review with 'cat /mnt/etc/fstab' if needed after chroot."
 
 # --- Chroot into New System and Configure ---
 echo "--- Entering Chroot Environment for System Configuration ---"
-# Variables that need to be accessible inside the chroot
-export HOSTNAME USERNAME # Exporting variables so they are available inside the subshell (EOF_CHROOT)
+# Pass HOSTNAME and USERNAME as arguments to the bash shell inside chroot
+# They will be accessible as $1 (for HOSTNAME) and $2 (for USERNAME)
+arch-chroot /mnt /bin/bash "$HOSTNAME" "$USERNAME" <<EOF_CHROOT
+# Assign arguments to meaningful variables inside chroot
+CHROOT_HOSTNAME="$1"
+CHROOT_USERNAME="$2"
 
-arch-chroot /mnt /bin/bash <<EOF_CHROOT
 echo "Inside chroot. Configuring system..."
 
 # Auto-detect Timezone
@@ -179,22 +182,57 @@ echo "LANG=$PRIMARY_LOCALE" > /etc/locale.conf || error_exit "Failed to set LANG
 echo "System locale set to $PRIMARY_LOCALE."
 
 
-# Use the exported HOSTNAME variable
-echo "Setting hostname to $HOSTNAME..."
-echo "$HOSTNAME" > /etc/hostname || error_exit "Failed to set hostname."
+# Use the passed CHROOT_HOSTNAME variable
+echo "Setting hostname to $CHROOT_HOSTNAME..."
+echo "$CHROOT_HOSTNAME" > /etc/hostname || error_exit "Failed to set hostname."
 
 echo "Configuring /etc/hosts..."
 cat <<EOL_HOSTS > /etc/hosts
 127.0.0.1   localhost
 ::1         localhost
-127.0.1.1   $HOSTNAME.localdomain $HOSTNAME
+127.0.1.1   $CHROOT_HOSTNAME.localdomain $CHROOT_HOSTNAME
 EOL_HOSTS
 
 echo "Setting root password..."
 passwd || error_exit "Failed to set root password."
 
-# Use the exported USERNAME variable
-echo "Creating user '$USERNAME'..."
-useradd -m -g users -G wheel,storage,power -s /bin/bash "$USERNAME" || error_exit "Failed to create user."
-echo "Setting password for user '$USERNAME'..."
-passwd "$USERNAME" || error_exit "Failed to
+# Use the passed CHROOT_USERNAME variable
+echo "Creating user '$CHROOT_USERNAME'..."
+useradd -m -g users -G wheel,storage,power -s /bin/bash "$CHROOT_USERNAME" || error_exit "Failed to create user."
+echo "Setting password for user '$CHROOT_USERNAME'..."
+passwd "$CHROOT_USERNAME" || error_exit "Failed to set user password."
+
+echo "Configuring sudo for wheel group..."
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers || error_exit "Failed to configure sudo."
+
+echo "Installing and configuring GRUB bootloader..."
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --removable || error_exit "GRUB installation failed."
+grub-mkconfig -o /boot/grub/grub.cfg || error_exit "GRUB configuration failed."
+
+echo "Enabling NetworkManager service..."
+systemctl enable NetworkManager || error_exit "Failed to enable NetworkManager."
+
+echo "--- Installing XFCE and Display Manager ---"
+XFCE_PACKAGES="xorg xorg-server xfce4 xfce4-goodies lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings"
+pacman -S --noconfirm $XFCE_PACKAGES || error_exit "Failed to install XFCE and display manager."
+
+echo "Enabling LightDM display manager..."
+systemctl enable lightdm || error_exit "Failed to enable LightDM."
+
+echo "Exiting chroot environment..."
+EOF_CHROOT
+
+if [ $? -ne 0 ]; then
+    error_exit "An error occurred inside the chroot environment. Installation aborted."
+fi
+
+echo "--- Finalizing Installation ---"
+echo "Unmounting file systems..."
+umount -R /mnt || error_exit "Failed to unmount /mnt. You may need to manually unmount."
+
+echo "--- Installation Complete! ---"
+echo "You can now reboot your system."
+echo "After reboot, log in as '$USERNAME' with the password you set."
+echo "You will be greeted by the XFCE desktop."
+
+confirm "Reboot now?" && reboot || echo "Please manually reboot your system."
