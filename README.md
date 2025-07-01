@@ -1,6 +1,6 @@
 # arch.min.sh
 
-## Lightweight. Minimalist. Unopinionated.
+### Lightweight. Minimalist. Unopinionated.
 
 ### Installation
 
