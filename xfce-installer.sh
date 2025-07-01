@@ -32,8 +32,7 @@ echo "Installing Xorg, XFCE Desktop Environment, and LightDM Display Manager..."
 echo "Packages to install: $XFCE_PACKAGES"
 pacman -S --noconfirm $XFCE_PACKAGES || error_exit "Failed to install GUI packages."
 
-echo "Enabling NetworkManager and LightDM services..."
-systemctl enable NetworkManager || echo "Warning: Failed to enable NetworkManager. Check your network setup."
+echo "Enabling LightDM services..."
 systemctl enable lightdm || error_exit "Failed to enable LightDM display manager."
 
 echo "--- GUI Setup Complete! ---"
