@@ -10,7 +10,6 @@ error_exit() {
     exit 1
 }
 
-# Function to ask for user confirmation
 confirm() {
     read -r -p "$1 (y/N): " response
     case "$response" in
@@ -25,7 +24,6 @@ confirm() {
 
 echo "--- Arch Linux GUI Setup Script ---"
 
-# Check if the script is run as root
 if [[ $EUID -ne 0 ]]; then
    error_exit "This script must be run as root."
 fi
