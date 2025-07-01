@@ -1,0 +1,1 @@
+# arch.min.sh
