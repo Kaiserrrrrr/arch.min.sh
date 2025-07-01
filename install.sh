@@ -1,4 +1,3 @@
-cat > install_de.sh << 'EOF'
 #!/bin/bash
 
 set -x
