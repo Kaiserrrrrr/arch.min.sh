@@ -1,6 +1,6 @@
 #!/bin/bash
 
-XFCE_PACKAGES="xorg xorg-server xfce4 xfce4-goodies lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings networkmanager"
+XFCE_PACKAGES="xorg xorg-server xfce4 xfce4-goodies lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings"
 
 error_exit() {
     echo "ERROR: $1" >&2
