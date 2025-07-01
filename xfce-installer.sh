@@ -19,7 +19,7 @@ confirm() {
     esac
 }
 
-echo "--- Arch Linux GUI Setup Script ---"
+echo "--- XFCE Setup Script ---"
 
 if [[ $EUID -ne 0 ]]; then
    error_exit "This script must be run as root."
