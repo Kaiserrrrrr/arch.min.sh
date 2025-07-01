@@ -44,8 +44,3 @@ echo "You can now reboot your system to log into the XFCE desktop."
 echo "Login with the user you created during archinstall."
 
 confirm "Reboot now to start XFCE?" && reboot || echo "Please manually reboot your system (e.g., 'reboot')."
-
-echo ""
-echo "--- Important: Manual System Minimalization Instructions ---"
-echo "To create a truly barebones system by uninstalling 'unnecessary' packages, follow the steps below CAREFULLY."
-echo "Automating this is highly risky due to complex package dependencies."
