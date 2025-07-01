@@ -24,16 +24,16 @@ timedatectl set-ntp true || error_exit "Failed to set NTP."
 # --- Get User Inputs ---
 read -p "Enter desired hostname for your system (e.g., myarchvm): " HOSTNAME
 if [ -z "$HOSTNAME" ]; then
-    error_exit "Hostname cannot be empty."
+    error_exit "Hostname cannot be empty. Exiting."
 fi
 
 read -p "Enter desired username for your daily use (e.g., archuser): " USERNAME
 if [ -z "$USERNAME" ]; then
-    error_exit "Username cannot be empty."
+    error_exit "Username cannot be empty. Exiting."
 fi
 
-read -p "Enter desired SWAP partition size (e.g., 2G, 4G - leave empty for no swap): " SWAP_SIZE_INPUT
-SWAP_SIZE=${SWAP_SIZE_INPUT:-"0"} # Default to 0 if empty, indicating no swap partition
+read -p "Enter desired SWAP partition size (e.g., 2G, 4G, 8G - leave empty for no swap): " SWAP_SIZE_INPUT
+SWAP_SIZE=${SWAP_SIZE_INPUT:-"0"} # Default to "0" if empty, indicating no swap partition
 
 # --- Partitioning ---
 echo "--- Disk Partitioning ---"
@@ -41,7 +41,7 @@ echo "You need to MANUALLY partition your disk. Use 'cfdisk' or 'fdisk'."
 echo "Identify your disk (e.g., /dev/sda, /dev/vda) using 'lsblk'."
 lsblk
 echo ""
-read -p "Enter the disk you want to partition (e.g., /dev/sda): " DISK
+read -p "Enter the disk you want to partition (e.g., /dev/sda or /dev/vda): " DISK
 if [ ! -b "$DISK" ]; then
     error_exit "$DISK is not a valid block device. Exiting."
 fi
@@ -62,21 +62,20 @@ echo "Listing new partitions:"
 lsblk "$DISK"
 echo ""
 
+# Get partition paths after manual partitioning
 read -p "Enter the EFI System Partition (e.g., /dev/sda1): " EFI_PARTITION
-read -p "Enter the ROOT Partition (e.g., /dev/sda3): " ROOT_PARTITION
-
-# Prompt for SWAP only if size was provided
-if [ "$SWAP_SIZE" != "0" ]; then
-    read -p "Enter the SWAP Partition (e.g., /dev/sda2): " SWAP_PARTITION
-    if [ ! -b "$SWAP_PARTITION" ]; then
-        error_exit "$SWAP_PARTITION is not a valid block device. Please re-check your input."
-    fi
-fi
-
-# Validate partitions
 if [ ! -b "$EFI_PARTITION" ]; then
     error_exit "$EFI_PARTITION is not a valid block device. Please re-check your input."
 fi
+
+if [ "$SWAP_SIZE" != "0" ]; then
+    read -p "Enter the SWAP Partition (e.g., /dev/sda2): " SWAP_PARTITION
+    if [ -z "$SWAP_PARTITION" ] || [ ! -b "$SWAP_PARTITION" ]; then
+        error_exit "SWAP_PARTITION cannot be empty or invalid if swap size was specified. Please re-check your input."
+    fi
+fi
+
+read -p "Enter the ROOT Partition (e.g., /dev/sda3): " ROOT_PARTITION
 if [ ! -b "$ROOT_PARTITION" ]; then
     error_exit "$ROOT_PARTITION is not a valid block device. Please re-check your input."
 fi
@@ -113,6 +112,9 @@ echo "fstab generated. Review with 'cat /mnt/etc/fstab' if needed after chroot."
 
 # --- Chroot into New System and Configure ---
 echo "--- Entering Chroot Environment for System Configuration ---"
+# Variables that need to be accessible inside the chroot
+export HOSTNAME USERNAME # Exporting variables so they are available inside the subshell (EOF_CHROOT)
+
 arch-chroot /mnt /bin/bash <<EOF_CHROOT
 echo "Inside chroot. Configuring system..."
 
@@ -155,7 +157,8 @@ case "$LOCALE_CHOICE" in
     *) echo "Invalid choice or skipped. Defaulting to en_US.UTF-8 as primary locale." ;;
 esac
 
-# Generate common UTF-8 locales by default
+echo "" > /etc/locale.gen
+# Generate common UTF-8 locales by default (can be extended)
 LOCALE_GEN_ENTRIES=(
     "en_US.UTF-8 UTF-8"
     "en_GB.UTF-8 UTF-8"
@@ -167,8 +170,6 @@ LOCALE_GEN_ENTRIES=(
     "ko_KR.UTF-8 UTF-8"
     "zh_CN.UTF-8 UTF-8"
 )
-
-echo "" > /etc/locale.gen
 for entry in "${LOCALE_GEN_ENTRIES[@]}"; do
     echo "$entry" >> /etc/locale.gen
 done
@@ -178,6 +179,7 @@ echo "LANG=$PRIMARY_LOCALE" > /etc/locale.conf || error_exit "Failed to set LANG
 echo "System locale set to $PRIMARY_LOCALE."
 
 
+# Use the exported HOSTNAME variable
 echo "Setting hostname to $HOSTNAME..."
 echo "$HOSTNAME" > /etc/hostname || error_exit "Failed to set hostname."
 
@@ -191,42 +193,8 @@ EOL_HOSTS
 echo "Setting root password..."
 passwd || error_exit "Failed to set root password."
 
+# Use the exported USERNAME variable
 echo "Creating user '$USERNAME'..."
 useradd -m -g users -G wheel,storage,power -s /bin/bash "$USERNAME" || error_exit "Failed to create user."
 echo "Setting password for user '$USERNAME'..."
-passwd "$USERNAME" || error_exit "Failed to set user password."
-
-echo "Configuring sudo for wheel group..."
-sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers || error_exit "Failed to configure sudo."
-
-echo "Installing and configuring GRUB bootloader..."
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --removable || error_exit "GRUB installation failed."
-grub-mkconfig -o /boot/grub/grub.cfg || error_exit "GRUB configuration failed."
-
-echo "Enabling NetworkManager service..."
-systemctl enable NetworkManager || error_exit "Failed to enable NetworkManager."
-
-echo "--- Installing XFCE and Display Manager ---"
-XFCE_PACKAGES="xorg xorg-server xfce4 xfce4-goodies lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings"
-pacman -S --noconfirm $XFCE_PACKAGES || error_exit "Failed to install XFCE and display manager."
-
-echo "Enabling LightDM display manager..."
-systemctl enable lightdm || error_exit "Failed to enable LightDM."
-
-echo "Exiting chroot environment..."
-EOF_CHROOT
-
-if [ $? -ne 0 ]; then
-    error_exit "An error occurred inside the chroot environment. Installation aborted."
-fi
-
-echo "--- Finalizing Installation ---"
-echo "Unmounting file systems..."
-umount -R /mnt || error_exit "Failed to unmount /mnt. You may need to manually unmount."
-
-echo "--- Installation Complete! ---"
-echo "You can now reboot your system."
-echo "After reboot, log in as '$USERNAME' with the password you set."
-echo "You will be greeted by the XFCE desktop."
-
-confirm "Reboot now?" && reboot || echo "Please manually reboot your system."
+passwd "$USERNAME" || error_exit "Failed to
