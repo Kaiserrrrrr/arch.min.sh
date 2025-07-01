@@ -1,6 +1,6 @@
 #!/bin/bash
 
-KDE_PACKAGES="xorg xorg-server plasma-desktop sddm dolphin konsole plasma-wayland-session"
+KDE_PACKAGES="xorg xorg-server plasma-desktop sddm dolphin konsole plasma-workspace"
 
 # Function for error handling and exiting
 error_exit() {
