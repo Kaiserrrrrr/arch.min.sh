@@ -34,8 +34,7 @@ echo "Installing Xorg, KDE Plasma Desktop Environment, and SDDM Display Manager.
 echo "Packages to install: $KDE_PACKAGES"
 pacman -S --noconfirm $KDE_PACKAGES || error_exit "Failed to install GUI packages."
 
-echo "Enabling NetworkManager and SDDM services..."
-systemctl enable NetworkManager || echo "Warning: Failed to enable NetworkManager. Check your network setup."
+echo "Enabling SDDM services..."
 systemctl enable sddm || error_exit "Failed to enable SDDM display manager."
 
 echo "--- KDE Plasma Minimal Setup Complete! ---"
