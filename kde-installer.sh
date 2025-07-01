@@ -19,7 +19,7 @@ confirm() {
     esac
 }
 
-echo "--- Arch Linux KDE Plasma Setup Script ---"
+echo "--- KDE Plasma Setup Script ---"
 
 if [[ $EUID -ne 0 ]]; then
    error_exit "This script must be run as root."
@@ -35,7 +35,7 @@ pacman -S --noconfirm $KDE_PACKAGES || error_exit "Failed to install GUI package
 echo "Enabling SDDM services..."
 systemctl enable sddm || error_exit "Failed to enable SDDM display manager."
 
-echo "--- KDE Plasma Minimal Setup Complete! ---"
+echo "--- KDE Plasma Setup Complete! ---"
 echo "You can now reboot your system to log into the desktop."
 
 confirm "Reboot now to start KDE Plasma?" && reboot || echo "Please manually reboot your system (e.g., 'reboot')."
