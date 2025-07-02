@@ -1,6 +1,6 @@
 #!/bin/bash
 
-KDE_PACKAGES="xorg xorg-server plasma-desktop sddm dolphin konsole plasma-workspace"
+KDE_PACKAGES="xorg xorg-server plasma-desktop plasma-workspace sddm dolphin konsole spectacle kwrite"
 
 error_exit() {
     echo "ERROR: $1" >&2
