@@ -14,6 +14,4 @@ fi
 pacman -Syu --noconfirm || error_exit "Failed to update system."
 pacman -S --noconfirm $KDE_PACKAGES || error_exit "Failed to install KDE packages."
 systemctl enable sddm || error_exit "Failed to enable SDDM display manager."
-
-echo "You can now reboot your system to log into KDE Plasma."
-confirm "Reboot now to start KDE Plasma?" && reboot || echo "Please manually reboot your system (e.g., 'reboot')."
+reboot
