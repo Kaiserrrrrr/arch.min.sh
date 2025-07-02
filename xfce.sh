@@ -1,6 +1,6 @@
 #!/bin/bash
 
-XFCE_PACKAGES="xorg xorg-server xfce4 xfce4-goodies lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings"
+XFCE_PACKAGES="xorg xorg-server xfce4 lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings"
 
 error_exit() {
     echo "ERROR: $1" >&2
@@ -13,5 +13,6 @@ fi
 
 pacman -Syu --noconfirm || error_exit "Failed to update system."
 pacman -S --noconfirm $XFCE_PACKAGES || error_exit "Failed to install XFCE packages."
+pacman -S --noconfirm --needed $(pacman -Sgq xfce4-goodies | grep -v -E "parole xfburn xfce4-dict") || error_exit "Failed to install XFCE Goodies"
 systemctl enable lightdm || error_exit "Failed to enable LightDM display manager."
 reboot
