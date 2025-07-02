@@ -7,35 +7,13 @@ error_exit() {
     exit 1
 }
 
-confirm() {
-    read -r -p "$1 (y/N): " response
-    case "$response" in
-        [yY][eE][sS]|[yY])
-            true
-            ;;
-        *)
-            false
-            ;;
-    esac
-}
-
-echo "--- KDE Plasma Setup Script ---"
-
 if [[ $EUID -ne 0 ]]; then
    error_exit "This script must be run as root."
 fi
 
-echo "Updating system packages..."
 pacman -Syu --noconfirm || error_exit "Failed to update system."
-
-echo "Installing Xorg, KDE Plasma Desktop Environment, and SDDM Display Manager..."
-echo "Packages to install: $KDE_PACKAGES"
 pacman -S --noconfirm $KDE_PACKAGES || error_exit "Failed to install KDE packages."
-
-echo "Enabling SDDM services..."
 systemctl enable sddm || error_exit "Failed to enable SDDM display manager."
 
-echo "--- KDE Plasma Minimal Setup Complete! ---"
-echo "You can now reboot your system to log into the desktop."
-
+echo "You can now reboot your system to log into KDE Plasma."
 confirm "Reboot now to start KDE Plasma?" && reboot || echo "Please manually reboot your system (e.g., 'reboot')."
