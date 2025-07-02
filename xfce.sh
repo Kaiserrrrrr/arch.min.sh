@@ -1,6 +1,6 @@
 #!/bin/bash
 
-error_exit() { echo "ERROR: $1" >&2;; exit 1 }
+error_exit() { echo "ERROR: $1" >&2; exit 1 }
 
 if [[ $EUID -ne 0 ]]; then error_exit "This script must be run as root."; fi
 
