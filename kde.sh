@@ -30,7 +30,7 @@ pacman -Syu --noconfirm || error_exit "Failed to update system."
 
 echo "Installing Xorg, KDE Plasma Desktop Environment, and SDDM Display Manager..."
 echo "Packages to install: $KDE_PACKAGES"
-pacman -S --noconfirm $KDE_PACKAGES || error_exit "Failed to install GUI packages."
+pacman -S --noconfirm $KDE_PACKAGES || error_exit "Failed to install KDE packages."
 
 echo "Enabling SDDM services..."
 systemctl enable sddm || error_exit "Failed to enable SDDM display manager."
