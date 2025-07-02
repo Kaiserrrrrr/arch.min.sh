@@ -1,6 +1,6 @@
 #!/bin/bash
 
-XFCE_PACKAGES="xorg xorg-server xfce4 lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings"
+XFCE_PACKAGES="xorg xorg-server xfce4 lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings fastfetch"
 
 error_exit() {
     echo "ERROR: $1" >&2
