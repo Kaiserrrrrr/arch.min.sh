@@ -2,13 +2,11 @@
 
 KDE_PACKAGES="xorg xorg-server plasma-desktop sddm dolphin konsole plasma-workspace"
 
-# Function for error handling and exiting
 error_exit() {
     echo "ERROR: $1" >&2
     exit 1
 }
 
-# Function to ask for user confirmation
 confirm() {
     read -r -p "$1 (y/N): " response
     case "$response" in
