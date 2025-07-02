@@ -14,6 +14,4 @@ fi
 pacman -Syu --noconfirm || error_exit "Failed to update system."
 pacman -S --noconfirm $XFCE_PACKAGES || error_exit "Failed to install XFCE packages."
 systemctl enable lightdm || error_exit "Failed to enable LightDM display manager."
-
-echo "You can now reboot your system to log into XFCE."
-confirm "Reboot now to start XFCE?" && reboot || echo "Please manually reboot your system (e.g., 'reboot')."
+reboot
