@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ARCHINSTALL_CONFIG_URL="https://raw.githubusercontent.com/Kaiserrrrrr/arch.min.sh/main/user_configuration.json"
-LOCAL_CONFIG_FILE="/tmp/archinstall_config.json"
+LOCAL_CONFIG_FILE="/tmp/user_configuration.json"
 
 err() {
     echo "ERROR: $1" >&2
@@ -54,11 +54,6 @@ if [[ $EUID -ne 0 ]]; then
     err "This script must be run as root."
 fi
 
-ping -c 1 archlinux.org > /dev/null 2>&1 || err "No internet connectivity. Connect to the internet."
-
-if ! command -v archinstall &> /dev/null; then
-    pacman -Sy archinstall --noconfirm &>/dev/null || err "Failed to install archinstall."
-fi
 
 if ! command -v jq &> /dev/null; then
     pacman -Sy jq --noconfirm &>/dev/null || err "Failed to install jq for JSON manipulation."
