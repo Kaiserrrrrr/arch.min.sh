@@ -1,114 +1,126 @@
 {
-    "archinstall-language": "English",
-    "audio_config": "pipewire",
-    "bootloader": "Grub",
-    "custom_commands": [
-        "pacman -Syu --noconfirm",
-        "pacman -S --noconfirm xorg xorg-server plasma-desktop plasma-workspace sddm chromium fastfetch htop",
-        "systemctl enable sddm",
-        "pacman -Sc"
-    ],
-    "disk_config": {
-        "btrfs_options": null,
-        "snapshot_config": null,
-        "config_type": "default_layout",
-        "device_modifications": [
-            {
-                "device": "/dev/sda",
-                "partitions": [
-                    {
-                        "btrfs": [],
-                        "dev_path": null,
-                        "flags": [
-                            "boot"
-                        ],
-                        "fs_type": "fat32",
-                        "mount_options": [],
-                        "mountpoint": "/boot",
-                        "obj_id": "4b0ffe0d-3845-4e51-9dc3-49a891b154de",
-                        "size": {
-                            "sector_size": null,
-                            "unit": "MiB",
-                            "value": 512
-                        },
-                        "start": {
-                            "sector_size": null,
-                            "unit": "MiB",
-                            "value": 1
-                        },
-                        "status": "create",
-                        "type": "primary"
-                    },
-                    {
-                        "btrfs": [],
-                        "dev_path": null,
-                        "flags": [],
-                        "fs_type": "ext4",
-                        "mount_options": [],
-                        "mountpoint": "/",
-                        "obj_id": "4b0ffe0d-3845-4e51-9dc3-49a891b154de",
-                        "size": {
-                            "sector_size": null,
-                            "unit": "Percent",
-                            "value": 100
-                        },
-                        "start": {
-                            "sector_size": null,
-                            "unit": "MiB",
-                            "value": 513
-                        },
-                        "status": "create",
-                        "type": "primary"
-                    }
-                ],
-                "wipe": true
-            }
-        ]
-    },
-    "hostname": "archlinux",
-    "kernels": [
-        "linux"
-    ],
-    "locale_config": {
-        "kb_layout": "us",
-        "sys_enc": "UTF-8",
-        "sys_lang": "en_US"
-    },
-    "mirror_config": {
-        "custom_repositories": [],
-        "custom_servers": [],
-        "mirror_regions": {
-            "Worldwide": [
-                "https://archlinux.org/mirrorlist/?country=Worldwide&protocol=https&use_mirror_status=on"
-            ]
-        },
-        "optional_repositories": []
-    },
-    "network_config": {
-        "type": "NetworkManager"
-    },
-    "no_pkg_lookups": false,
-    "ntp": true,
-    "offline": false,
-    "packages": [],
-    "parallel_downloads": 0,
-    "profile": {
-        "audio": ["pipewire"],
-        "desktop": ["plasma"],
-        "gfx": ["All open-source (default)"],
-        "greeter": "sddm",
-        "linux_kernel": ["linux"],
-        "packages": [
-            "chromium",
-            "fastfetch",
-            "htop"
+  "archinstall-language": "English",
+  "audio_config": {
+    "audio": "pipewire"
+  },
+  "bootloader": "Systemd-boot",
+  "debug": false,
+  "disk_config": {
+    "config_type": "default_layout",
+    "device_modifications": [
+      {
+        "device": "/dev/sda",
+        "partitions": [
+          {
+            "btrfs": [],
+            "flags": [
+              "boot"
+            ],
+            "fs_type": "fat32",
+            "size": {
+              "unit": "MiB",
+              "value": 512
+            },
+            "mount_options": [],
+            "mountpoint": "/boot",
+            "obj_id": "2c3fa2d5-2c79-4fab-86ec-22d0ea1543c0",
+            "start": {
+              "unit": "MiB",
+              "value": 1
+            },
+            "status": "create",
+            "type": "primary"
+          },
+          {
+            "btrfs": [],
+            "flags": [],
+            "fs_type": "ext4",
+            "size": {
+              "unit": "GiB",
+              "value": 20
+            },
+            "mount_options": [],
+            "mountpoint": "/",
+            "obj_id": "3e7018a0-363b-4d05-ab83-8e82d13db208",
+            "start": {
+              "unit": "MiB",
+              "value": 513
+            },
+            "status": "create",
+            "type": "primary"
+          },
+          {
+            "btrfs": [],
+            "flags": [],
+            "fs_type": "ext4",
+            "size": {
+              "unit": "Percent",
+              "value": 100
+            },
+            "mount_options": [],
+            "mountpoint": "/home",
+            "obj_id": "ce58b139-f041-4a06-94da-1f8bad775d3f",
+            "start": {
+              "unit": "GiB",
+              "value": 20
+            },
+            "status": "create",
+            "type": "primary"
+          }
         ],
-        "profile": "desktop"
+        "wipe": true
+      }
+    ]
+  },
+  "hostname": "archlinux",
+  "kernels": [
+    "linux"
+  ],
+  "locale_config": {
+    "kb_layout": "us",
+    "sys_enc": "UTF-8",
+    "sys_lang": "en_US"
+  },
+  "mirror_config": {
+    "custom_servers": [],
+    "mirror_regions": {
+      "Worldwide": [
+        "https://archlinux.org/mirrorlist/?country=Worldwide&protocol=https&use_mirror_status=on"
+      ]
     },
-    "services": [],
-    "swap": true,
-    "sys-encoding": "UTF-8",
-    "sys-language": "en_US",
-    "timezone": "UTC",
-    "users": []
+    "optional_repositories": [
+      "testing"
+    ],
+    "custom_repositories": []
+  },
+  "network_config": {
+    "type": "NetworkManager"
+  },
+  "no_pkg_lookups": false,
+  "ntp": true,
+  "offline": false,
+  "packages": [],
+  "parallel downloads": 0,
+  "profile_config": {
+    "gfx_driver": "All open-source (default)",
+    "greeter": "sddm",
+    "profile": {
+      "details": [
+        "KDE Plasma"
+      ],
+      "main": "Desktop"
+    }
+  },
+  "script": "guided",
+  "silent": false,
+  "swap": true,
+  "timezone": "UTC",
+  "version": "2.8.6",
+  "custom_commands": [
+    "pacman -Syu --noconfirm",
+    "pacman -S --noconfirm xorg xorg-server plasma-desktop plasma-workspace sddm chromium fastfetch htop",
+    "systemctl enable sddm",
+    "pacman -Sc"
+  ],
+  "users": []
 }
