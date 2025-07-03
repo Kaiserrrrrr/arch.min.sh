@@ -8,6 +8,16 @@ err() {
     exit 1
 }
 
+get_confirmation() {
+    read -p "$1 (y/N): " -n 1 -r
+    echo "" # Newline after input
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        return 0 # True
+    else
+        return 1 # False
+    fi
+}
+
 get_user_timezone() {
     local TZ=""
 
