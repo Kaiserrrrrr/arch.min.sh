@@ -1,5 +1,5 @@
 #!/bin/bash
-PKG="xorg xorg-server plasma-desktop plasma-workspace sddm chromium fastfetch htop"
+PKG="xorg xorg-server plasma-desktop plasma-workspace sddm dolphin konsole spectacle kate chromium fastfetch htop"
 err() { echo "ERROR: $1" >&2; exit 1; }
 if [[ $EUID -ne 0 ]]; then err "This script must be run as root."; fi
 pacman -Syu --noconfirm || err "Failed to update system."
