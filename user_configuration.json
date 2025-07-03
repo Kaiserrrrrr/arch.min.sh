@@ -50,7 +50,7 @@
                         },
                         "status": "create",
                         "type": "primary"
-                    }
+                    },
                 ],
                 "wipe": true
             }
